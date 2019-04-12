@@ -19,9 +19,9 @@ import (
 	sd_config "github.com/prometheus/prometheus/discovery/config"
 	"github.com/prometheus/prometheus/discovery/targetgroup"
 
+	"github.com/grafana/loki/pkg/logentry"
 	"github.com/grafana/loki/pkg/logproto"
 	"github.com/grafana/loki/pkg/parser"
-	"github.com/grafana/loki/pkg/promtail/api"
 	"github.com/grafana/loki/pkg/promtail/config"
 	"github.com/grafana/loki/pkg/promtail/scrape"
 )
@@ -388,9 +388,17 @@ func buildTestConfig(t *testing.T, positionsFileName string, logDirName string) 
 		},
 	}
 
+	stages := []logentry.PipelineStage{
+		{
+			"regex": map[string]interface{}{
+				"expr": "./*",
+			},
+		},
+	}
+
 	scrapeConfig := scrape.Config{
 		JobName:                "",
-		EntryParser:            api.Raw,
+		PipelineStages:         stages,
 		RelabelConfigs:         nil,
 		ServiceDiscoveryConfig: serviceConfig,
 	}
